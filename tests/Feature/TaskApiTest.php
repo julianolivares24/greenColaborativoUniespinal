@@ -2,31 +2,38 @@
 
 use App\Models\Task;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+class TaskApiTest extends TestCase
+{
+    use RefreshDatabase;
 
-it('lista las tareas existentes', function () {
-    Task::factory()->count(3)->create();
+    public function test_lista_las_tareas_existentes(): void
+    {
+        Task::factory()->count(3)->create();
 
-    $response = $this->getJson('/api/v1/tasks');
+        $response = $this->getJson('/api/v1/tasks');
 
-    $response->assertStatus(200)
-        ->assertJsonCount(3, 'data');
-});
+        $response->assertStatus(200)
+            ->assertJsonCount(3, 'data');
+    }
 
-it('crea una tarea nueva', function () {
-    $payload = ['title' => 'Repasar rutas de Laravel'];
+    public function test_crea_una_tarea_nueva(): void
+    {
+        $payload = ['title' => 'Repasar rutas de Laravel'];
 
-    $response = $this->postJson('/api/v1/tasks', $payload);
+        $response = $this->postJson('/api/v1/tasks', $payload);
 
-    $response->assertStatus(201)
-        ->assertJsonFragment(['title' => 'Repasar rutas de Laravel']);
+        $response->assertStatus(201)
+            ->assertJsonFragment(['title' => 'Repasar rutas de Laravel']);
 
-    $this->assertDatabaseHas('tasks', ['title' => 'Repasar rutas de Laravel']);
-});
+        $this->assertDatabaseHas('tasks', ['title' => 'Repasar rutas de Laravel']);
+    }
 
-it('devuelve 404 si la tarea no existe', function () {
-    $response = $this->getJson('/api/v1/tasks/999');
+    public function test_devuelve_404_si_la_tarea_no_existe(): void
+    {
+        $response = $this->getJson('/api/v1/tasks/999');
 
-    $response->assertStatus(404);
-});
+        $response->assertStatus(404);
+    }
+}
